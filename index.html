@@ -3,38 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laboratori de Divisibilitat Pro</title>
+    <title>Laboratori de Divisibilitat</title>
     <style>
         :root { --primary: #4f46e5; --ultra: #7c3aed; --success: #22c55e; --error: #ef4444; --bg: #f8fafc; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #1e293b; }
         .container { max-width: 900px; margin: 0 auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         
-        /* PANTALLES */
+        /* Pantalles */
         .screen { display: none; }
-        .screen.active { display: block; }
+        .screen.active { display: block !important; }
 
-        /* MENÚ INICIAL */
+        /* Menú */
         #menuScreen { text-align: center; }
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; }
         .menu-card { background: #f1f5f9; padding: 20px; border-radius: 15px; border: 2px solid #e2e8f0; }
         .lvl-btn { width: 100%; margin: 8px 0; padding: 14px; border: 1px solid #cbd5e1; border-radius: 10px; cursor: pointer; font-weight: bold; background: white; transition: 0.2s; }
-        .lvl-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        .lvl-btn:hover { background: var(--primary); color: white; }
         .ultra-btn { background: #1e293b; color: #a78bfa; border: 2px solid #7c3aed; font-size: 1.1rem; }
         .ultra-btn:hover { background: var(--ultra); color: white; }
 
-        /* HUD (BARRA ESTATS) */
+        /* HUD */
         .stats-bar { display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: center; background: #1e293b; color: white; padding: 15px 25px; border-radius: 12px; margin-bottom: 20px; }
         .timer-bar { width: 100%; height: 8px; background: #475569; border-radius: 4px; margin-top: 5px; overflow: hidden; }
         #timerProgress { width: 100%; height: 100%; background: var(--success); transition: width 1s linear; }
 
-        /* TAULA DE JOC */
+        /* Joc */
         table { width: 100%; border-collapse: separate; border-spacing: 5px; }
         th { background: #f1f5f9; padding: 12px; border-radius: 8px; font-size: 0.85rem; }
-        td { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; text-align: center; height: 60px; font-weight: bold; font-size: 1.1rem; }
+        td { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; text-align: center; height: 60px; font-weight: bold; }
         .check-cell { cursor: pointer; font-size: 1.4rem; color: transparent; transition: 0.2s; }
-        .check-cell:hover { background: #f8fafc; }
-        .check-cell.correct { background: #dcfce7 !important; color: #166534 !important; border-color: var(--success); }
-        .check-cell.wrong { background: #fee2e2 !important; color: #991b1b !important; border-color: var(--error); }
+        .check-cell.correct { background: #dcfce7 !important; color: #166534 !important; }
+        .check-cell.wrong { background: #fee2e2 !important; color: #991b1b !important; }
 
-        /* RESUM FINAL (OVERLAY) */
-        #summaryOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background
+        /* Resum */
+        #summaryOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.95); z-index: 100; color: white; display: none; justify-content: center; align-items: center; text-align: center; }
+        .summary-box { background: #1e293b; padding: 40px; border-radius: 20px; border: 3px solid var(--primary); width: 80%; max-width: 400px; }
+        .summary-val { font-size: 3rem; color: #fbbf24; font-weight: bold; display: block; margin: 10px 0; }
+        
+        .explanation { background: #fffbeb; border: 1px solid #fde68a; padding: 15px; border-radius: 10px; margin-bottom: 15px; display: none; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+<div id="summaryOverlay">
+    <div class="summary-box">
+        <h2 id="summaryTitle">RESULTATS</h2>
+        <div>
+            Punts: <span class="summary-val" id="finalScore">0</span>
+            Nivell: <span id="finalLevel" style="color:var(--primary)">-</span><br>
+            Temps restant: <span id="finalTime">0</span>s
+        </div>
+        <p style="color:#94a3b8; font-size:0.8rem; margin-top:15px">📸 Fes una captura de pantalla.</p>
+        <button class="lvl-btn" onclick="location.reload()">Torna al Menú</button>
+    </div>
+</div>
+
+<div class="container">
+    
+    <div id="menuScreen" class="screen active">
+        <h1>Laboratori de Divisibilitat</h1>
+        <p>Tria un mode per començar</p>
+        <div class="menu-grid">
+            <div class="menu-card">
+                <h3>Mode Normal</h3>
+                <button class="lvl-btn" onclick="startGame(0)">Nivell 1 (2, 5, 10)</button>
+                <button class="lvl-btn" onclick="startGame(1)">Nivell 2 (2, 3, 6)</button>
+                <button class="lvl-btn" onclick="startGame(2)">Nivell 3 (3, 4, 12)</button>
+            </div>
+            <div class="menu-card" style="border-color: var(--ultra); background: #f5f3ff;">
+                <h3>Mode Expert</h3>
+                <button class="lvl-btn ultra-btn" onclick="startGame(3)">MODE ULTRA</button>
+                <p><small>(7, 8, 9, 11)</small></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="gameArea" class="screen">
+        <div class="stats-bar">
+            <div><span id="lvlDisplay" style="font-weight:bold">Nivell</span><br><small>Resten: <span id="remDisplay" style="color:#fbbf24">0</span></small></div>
+            <div style="text-align:center">
+                <span id="timeDisplay" style="font-family:monospace; font-size:1.6rem">00:45</span>
+                <div class="timer-bar"><div id="timerProgress"></div></div>
+            </div>
+            <div style="text-align:right">Punts: <span id="scoreDisplay">0</span><br><span id="livesDisplay">❤️❤️❤️</span></div>
+        </div>
+        <div id="explanation" class="explanation"></div>
+        <table id="gameTable"><thead id="tHead"></thead><tbody id="tBody"></tbody></table>
+    </div>
+
+</div>
+
+<script>
+    const rules = {
+        2: "Parell.", 3: "Suma de xifres.", 4: "Últimes 2 xifres.", 5: "Acaba en 0 o 5.",
+        6: "Divisible per 2 i 3.", 7: "Doble de l'última.", 8: "Últimes 3 xifres.", 
+        9: "Suma xifres = 9.", 10: "Acaba en 0.", 11: "Resta posicions.", 12: "3 i 4 alhora."
+    };
+
+    const config = [
+        { name: "Nivell 1", divs: [2, 5, 10], time: 45 },
+        { name: "Nivell 2", divs: [2, 3, 6], time: 45 },
+        { name: "Nivell 3", divs: [3, 4, 12], time: 45 },
+        { name: "ULTRA", divs: [7, 8, 9, 11], time: 90 }
+    ];
+
+    let state = { score: 0, lives: 3, levelIdx: 0, timeLeft: 45, remaining: 0, timerId: null };
+
+    function startGame(idx) {
+        state.levelIdx = idx;
+        state.score = 0;
+        state.lives = 3;
+        document.getElementById('menuScreen').classList.remove('active');
+        document.getElementById('gameArea').classList.add('active');
+        renderTable();
+    }
+
+    function renderTable() {
+        const conf = config[state.levelIdx];
+        state.remaining = 0;
+        state.timeLeft = conf.time;
+        
+        document.getElementById('tHead').innerHTML = `<tr><th>Número</th>${conf.divs.map(d => `<th>${d}</th>`).join('')}</tr>`;
+        const body = document.getElementById('tBody');
+        body.innerHTML = '';
+
+        for (let i = 0; i < 5; i++) {
+            let num = Math.floor(Math.random() * (state.levelIdx === 3 ? 5000 : 2000)) + 11;
+            conf.divs.forEach(d => { if (num % d === 0) state.remaining++; });
+            let row = document.createElement('tr');
+            let html = `<td>${num}</td>`;
+            conf.divs.forEach(d => { html += `<td class="check-cell" onclick="check(this, ${num}, ${d})">?</td>`; });
+            row.innerHTML = html;
+            body.appendChild(row);
+        }
+        updateHUD();
+        startTimer();
+    }
+
+    function startTimer() {
+        if (state.timerId) clearInterval(state.timerId);
+        state.timerId = setInterval(() => {
+            state.timeLeft--;
+            updateHUD();
+            if (state.timeLeft <= 0) endGame("S'HA ACABAT EL TEMPS");
+        }, 1000);
+    }
+
+    function updateHUD() {
+        const conf = config[state.levelIdx];
+        const progress = document.getElementById('timerProgress');
+        const percent = (state.timeLeft / conf.time) * 100;
+        document.getElementById('timeDisplay').innerText = `00:${state.timeLeft < 10 ? '0' : ''}${state.timeLeft}`;
+        progress.style.width = percent + "%";
+        document.getElementById('scoreDisplay').innerText = state.score;
+        document.getElementById('livesDisplay').innerText = "❤️".repeat(Math.max(0, state.lives));
+        document.getElementById('remDisplay').innerText = state.remaining;
+        document.getElementById('lvlDisplay').innerText = conf.name;
+    }
+
+    function check(el, n, d) {
+        if (el.classList.contains('correct') || el.classList.contains('wrong') || state.lives <= 0) return;
+        if (n % d === 0) {
+            el.classList.add('correct'); el.innerText = "✓";
+            state.score += 10; state.remaining--;
+            if (state.remaining === 0) {
+                clearInterval(state.timerId);
+                if (state.levelIdx < 2) { state.levelIdx++; setTimeout(renderTable, 600); }
+                else { endGame("REPTE COMPLETAT!"); }
+            }
+        } else {
+            el.classList.add('wrong'); el.innerText = "✗";
+            state.lives--;
+            const exp = document.getElementById('explanation');
+            exp.style.display = 'block';
+            exp.innerHTML = `<b>Error:</b> ${n} no es divisible per ${d}. <br><small>${rules[d]}</small>`;
+            if (state.lives <= 0) endGame("GAME OVER");
+        }
+        updateHUD();
+    }
+
+    function endGame(title) {
+        clearInterval(state.timerId);
+        document.getElementById('summaryOverlay').style.display = 'flex';
+        document.getElementById('summaryTitle').innerText = title;
+        document.getElementById('finalScore').innerText = state.score;
+        document.getElementById('finalLevel').innerText = config[state.levelIdx].name;
+        document.getElementById('finalTime').innerText = Math.max(0, state.timeLeft);
+    }
+</script>
+</body>
+</html>
